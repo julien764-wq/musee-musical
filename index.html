@@ -1,0 +1,558 @@
+x<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Musée Musical — Archives Annuelles</title>
+<style>
+:root{--bg:#101010;--panel:#181818;--panel2:#202020;--text:#f4f0e8;--muted:#aaa7a0;--accent:#d6a36a;--line:#33302b;--green:#1ed760}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,Arial,Helvetica,sans-serif}
+.app{min-height:100vh;display:grid;grid-template-columns:215px 1fr}
+aside{border-right:1px solid var(--line);padding:28px 20px;display:flex;flex-direction:column;gap:24px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.brand{font-size:18px;letter-spacing:.04em;font-weight:750;line-height:1.2}.subbrand{font-size:10px;letter-spacing:.16em;color:var(--muted);margin-top:5px}
+nav{display:grid;gap:6px}
+nav a{color:#c6c2bb;text-decoration:none;padding:10px;border-radius:8px;font-size:13px;display:flex;align-items:center;gap:8px;cursor:pointer}
+nav a.active,nav a:hover{background:#29241e;color:var(--accent)}
+.year-selector{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.year-btn{background:var(--panel2);border:1px solid var(--line);color:var(--text);padding:5px 9px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600}
+.year-btn.active,.year-btn:hover{background:var(--accent);color:#101010;border-color:var(--accent)}
+.quote{color:#b4aaa0;font-family:Georgia,serif;font-style:italic;line-height:1.55;font-size:13px;margin-top:auto}
+main{padding:32px clamp(22px,4vw,58px) 28px;min-width:0;max-width:1600px;width:100%;margin:auto}
+.hero{position:relative;overflow:hidden;padding:10px 0 28px;border-bottom:1px solid var(--line);margin-bottom:26px}
+.hero:after{content:"";position:absolute;width:300px;height:300px;border:1px solid #493a2c;border-radius:50%;right:3%;top:-175px;box-shadow:0 0 0 12px #17130f,0 0 0 13px #33271d,0 0 0 30px #13110f,0 0 0 31px #28221c;opacity:.7;pointer-events:none}
+h1{font-size:clamp(54px,7vw,86px);line-height:.95;letter-spacing:-.06em;margin:10px 0 5px;position:relative;z-index:1}
+.hero h2{font-weight:400;font-size:28px;color:#d0c8bf;margin:0 0 12px}
+.intro{color:var(--muted);font-size:14px;line-height:1.6;max-width:520px}
+.search-bar{margin:20px 0 10px;display:flex;gap:10px;max-width:400px}
+.search-bar input{width:100%;background:var(--panel);border:1px solid var(--line);color:var(--text);padding:10px 14px;border-radius:8px;font-size:13px;outline:none}
+.search-bar input:focus{border-color:var(--accent)}
+.section-head{display:flex;align-items:baseline;gap:18px;margin:25px 0 18px}
+.section-head h3{margin:0;font-size:19px;white-space:nowrap}
+.rule{height:1px;background:var(--line);flex:1}.count{color:var(--muted);font-size:12px}
+.featured{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:25px 22px}
+.track-card{min-width:0;display:flex;flex-direction:column}
+.cover{aspect-ratio:1/1;border-radius:6px;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;text-align:center;padding:15px;box-shadow:0 5px 18px #0007;background-size:cover;background-position:center}
+.cover.fallback{background:radial-gradient(circle at 30% 25%,#2a221b,#181410)}
+.cover.fallback:before{content:"";position:absolute;inset:8%;border:1px solid #ffffff1a;border-radius:50%}
+.cover.fallback:after{content:"";position:absolute;width:30%;height:30%;border-radius:50%;background:#111b;box-shadow:0 0 0 7px #ffffff0a}
+.cover .arttext{position:relative;z-index:1;font-weight:800;letter-spacing:.07em;text-transform:uppercase;font-size:clamp(12px,1.4vw,18px);line-height:1.15;color:var(--text);text-shadow:0 2px 8px #000;max-width:90%;overflow-wrap:anywhere}
+.track-meta{display:flex;gap:9px;align-items:flex-start;margin-top:12px}
+.rank{color:var(--accent);font-weight:700;font-size:13px;min-width:22px}
+.track-name{font-size:14px;font-weight:650;line-height:1.35}
+.artist{font-size:12px;color:var(--muted);margin-top:3px}
+.listen{display:inline-flex;align-items:center;gap:7px;color:#c8c6c0;text-decoration:none;font-size:11px;margin:10px 0 0 31px;font-weight:600}
+.listen:before{content:"";width:10px;height:10px;border-radius:50%;background:var(--green);display:inline-block}
+.listen:hover{color:var(--green)}
+.compact{display:grid;grid-template-columns:1fr 1fr;gap:0 28px}
+.list-track{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:10px;align-items:center;border-bottom:1px solid #242424;padding:10px 0;min-width:0}
+.list-title{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.list-artist{font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.list-track .listen{margin:0;font-size:11px}
+footer{border-top:1px solid var(--line);margin-top:40px;padding-top:16px;display:flex;justify-content:space-between;color:#777;font-size:11px}
+@media(max-width:900px){.app{grid-template-columns:1fr}aside{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line)}.featured{grid-template-columns:repeat(2,minmax(0,1fr))}.compact{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside>
+  <div>
+    <div class="brand">LE MUSÉE MUSICAL</div>
+    <div class="subbrand">ARCHIVES PERSONNELLES</div>
+  </div>
+  <nav>
+    <a id="nav-home" class="active">⌂ &nbsp; Accueil par année</a>
+    <a id="nav-artists">♙ &nbsp; Par artiste</a>
+  </nav>
+  <div id="years-block">
+    <div style="font-size:11px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">Années disponibles</div>
+    <div class="year-selector" id="year-btns"></div>
+  </div>
+  <div class="quote">Une année.<br>50 morceaux.<br>Depuis 2009.</div>
+</aside>
+
+<main>
+  <div class="hero">
+    <h1 id="hero-title">2025</h1>
+    <h2 id="hero-subtitle">Top 50</h2>
+    <div class="intro" id="hero-intro">Sélection des morceaux qui ont marqué l'année.</div>
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Rechercher un morceau ou un artiste...">
+    </div>
+  </div>
+
+  <div id="content-area"></div>
+
+  <footer>
+    <span>Le Musée Musical — Archives Annuelles</span>
+    <span id="footer-info">2025 · Top 50</span>
+  </footer>
+</main>
+</div>
+
+<script>
+const archives = {
+  "2025": [
+    ["BAILE INOLVIDAVLE","Bad Bunny"],["MUTT","Leon Thomas"],["Ring Ring Ring","Tyler The Creator"],["Love Me Not","Ravyn Lenae"],
+    ["One Thing","Lola Young"],["Dracula","Tame Impala"],["Just Cool","Obongjayar"],["Body Language","Ezra Collective"],
+    ["Wildflowers","Nao"],["Messy","Lola Young"],["Sugar On My Tongue","Tyler The Creator"],["I Need It","Blasé, Cola Boyy"],
+    ["Don't Speak","Loaded Honey"],["Loser","Tame Impala"],["Call On Me","Daniel Caesar"],["All I Ever Asked","Rachel Chinouriri"],
+    ["Daydreaming","Young Franco"],["Suzanne","Raye, Mark Ronson"],["Keep Me Satisfied","Jungle"],["Lion","Little Simz, Obongjayar"],
+    ["Yougotmefeeling","Parcels"],["Sucka Free","Tyler The Creator"],["I Know You'd Kill","Joy Crookes"],["Paquera","Tentendo"],
+    ["Vaitimbora","Trinix, Mari Froes"],["All That Glitters Is Not Gold","Myd, Channel Tres"],["Walk Again","Cola Boyy"],
+    ["Walking Away","Mlchi"],["Nice To Each Other","Olivia Dean"],["FASHION DESIGNA","Theodora"],["Super","Bb Trickz"],
+    ["Sweetie","Kokoroko"],["Athlete","Spill Tab"],["Falling","MAX RAD, Tutankhamun"],["Ain't I Good For You","Yazmin Lacey"],
+    ["Chintamani","Céline Dessberg"],["Lose Control","Young Franco"],["Catch These Fists","Wet Leg"],["The One","Gabriel Jacoby"],
+    ["Everybody Gets Down","NxWorries, Knxwledge"],["DUN DI DUN","Mysie, Soxx"],["Your Soul & Mine","Badbadnotgood"],
+    ["Brand New Me","Saint Etienne"],["Sunshine & Rain...","Kali Uchis"],["Rüzgar","Islandman"],["melodrama","Disiz, Theodora"],
+    ["Labor of Love","CARTOONS, Haile Supreme"],["All About Me","Jalen Ngonda"],["All Wishes Come True","Wild Gloriosa"],["Sailing Away","Antoine Bourachot"]
+  ],
+  "2024": [
+    ["Nice Town","Metronomy, Pan Amsterdam"],["Coyote, You're My Star","Dana and Alden"],["Dislocation","Raze Regal & White Denim Inc."],
+    ["Nothing Matters","The Last Dinner Party"],["Image","Magdalena Bay"],["Howlin' at the New Moon","Alice Ivy, Mayer Hawthorne"],
+    ["MILLION DOLLAR BABY","Tommy Richman"],["The Payback","Aaron Frazer"],["Price I'll Pay","Thee Sacred Souls"],["Colors","Chenayder, Mavi"],
+    ["Frisco Blues","Lewis OfMan"],["Loso Na Madesu","Brian Nasty, Natanya"],["In My Head","Rosie Lowe"],["Dream With You","Thandii"],
+    ["Mulholland's Dinner and Wine","Declan McKenna"],["Hold Me Up (Thank You)","Khruangbin"],["Ice Cream Song","Dana and Alden"],
+    ["Les garçons","Lescop"],["God Gave Me Feet For Dancing","Ezra Collective, Yazmin Lacey"],["Live For You","Thee Sacred Souls"],
+    ["Sailor Song","Gigi Perez"],["Cactus Water","Channel Tres"],["Let's Go Back","Jungle"],["Scenic Route","Brijean"],
+    ["On The Floor","Mayer Hawthorne"],["Sir Princess Bad Bitch","Yaya Bey"],["Dream Job","Yard Act"],["Igual Que Un Angel","Kali Uchis"],
+    ["Lucky (Song 7)","Busty and the Bass"],["Run Your Mouth","The Marias"],["Freak","Liv East"],["It Is What It Is","Rachel Chinouriri"],
+    ["Nobody But You","Brainstory"],["Workin' On It","Brijean"],["Small Change","Don West"],["Magic On My Back","Mykki Blanco"],
+    ["Metropolis","Kit Sebastian"],["Leaveyourlove","Parcels"],["Got To Be Good","Gotts Street Park, Pip Millett"],["I Forget (I'm So Young)","Sofie Royer"],
+    ["Ice Comfortable","Blasé"],["Cinderella","Remi Wolf"],["Starbuster","Fontaines D.C."],["Undone","ISHA, MAX RAD"],["Me Da Igual","L'Impératrice"],
+    ["My Fun","Suki Waterhouse"],["Holy, Holy","Geordie Greep"],["Cards On The Table","Nia Archives"],["Aguas Blancas","James Alexander Bright"],
+    ["Cream Of The Crop","Getdown Services"]
+  ],
+  "2023": [
+    ["Electric Fish","Ana Frango Elétrico"],["Forget Me Not","Say She She"],["Fables","Rahill, Beck"],["210 Breeze","Yorke"],
+    ["Doin' Fine Today","Trash Panda"],["The World","Benny Sings"],["Sweet Harmony","Sirens of Lesbos"],["Danger","Olivia Dean"],
+    ["Our Time","DA BREAK"],["Shake It Up","The Breathing Effect"],["Pyjamas","Benny Sings, Remi Wolf"],["Back On 74","Jungle"],
+    ["Konami","Pearl & The Oysters"],["Late Night People","Yazmin Lacey"],["Terra Preta","Tapioca"],["Am I Sad?","Gecko Turner"],
+    ["Indossare Il Mare","Edoardo Florio Di Grazia"],["Balanço de Amor","Curandeira, BEESAU"],["That Life","Unknown Mortal Orchestra"],
+    ["Candle Flame","Jungle, Erick The Architect"],["Sauna","Vulfpeck"],["Just Like You Used To","Jalen Ngonda"],["From A Lover","Yazmin Lacey"],["Pra Tras","Tagua Tagua"],
+    ["Insista em Mim","Ana Frango Elétrico"],["Don't You Dare Stop","Say She She"],["Pacific Ave","Pearl & The Oysters"],["Man","Joe Yorke"],
+    ["You Can Count On Me","Lee Fields"],["Moonlight","Kali Uchis"],["8 Billion","Sirens of Lesbos"],["Su Siziyor","Altin Gün"],
+    ["Existe Uma Voz","Rogê"],["Get It Got It","Adi Oasis"],["DYKWYD","Butcher Brown"],["Dominoes","Jungle"],["Astral Plane","Say She She"],
+    ["Dela","Ana Frango Elétrico"],["Passed Over","Art Feynman"],["If You Don't Want My Love","Jalen Ngonda"],["Thoughtless Feeling","Bloomhaus"],
+    ["Zara","Joe Yorke"],["Exodus The North Star","Yaya Bey"],["Move Your Body","Bloomhaus"],["The Universe","Roisin Murphy"],
+    ["Going Home To A Party","JW Francis"],["Sale el Sol","Pachyman"],["This Is My Story","Holy Hive"],["Nobody But You","Brainstory"],
+    ["Destello","Captain Planet, Tagua Tagua"]
+  ],
+  "2022": [
+    ["Tienaté","Nu Genea"],["Protein","Jeshi, Obongjaer"],["Human Trumpet","DELV!S"],["Angels & Queens","Gabriels"],["Because","Black Thought, Danger Mouse, Joey Bada$$"],
+    ["Something's Going On","Kokoroko"],["Bal","Derya Yildirim & Grup Simsek"],["Yar Qi","Satellites"],["All I Can Do","Wax Machine"],
+    ["James Stern","J.P. Bimeni, The Black Belts"],["Just Say Play","Jerry Paper"],["B-Side","Khruangbin, Leon Bridges"],
+    ["Yeni Gün","Selman Faris"],["Cantares","Buscabulla"],["Rire","Nu Genea"],["Bad Habit","Steve Lacy"],["Jackie Down The Line","Fontaines D.C."],
+    ["BEESWAX","hard life"],["Millennium","Toro Y Moi"],["PROBLEMZ","Jungle"],["The Smoke","The Smile"],["Estacion Esperanza","Sofia Kourtesis, Manu Chao"],
+    ["Cecin n'est pas un cliché","Charlotte Adigéry, Bolis Pupul"],["The Otherside","Bobby Oroza"],["Ciara","Sudan Archives"],["Postman","Toro Y Moi"],
+    ["Pilot","DOMi & JD BECK, Anderson Paak"],["RHYTHM TO YA LOVE","Sunni Colon"],["Forever","TEED"],["The Darkest Part","Black Thought, Danger Mouse"],
+    ["Fool Around","strongboi"],["JVP","Mr GISCARD"],["Under The Sun","Lady Wray"],["What It Is","Amber Mark"],["Hotline","bLAck pARty"],
+    ["Asking for a Friend","Hector Gachan"],["I'm in a Funk","Franc Moody"],["Wet Dream","Wet Leg"],["One Amber Mark","Amber Mark"],["Stuck In The Middle","Greentea Peng"],
+    ["Trouble in Wackyland, Pt. II","Suff Daddy"],["Other Men","Crtystal Murray, Le Diouck"],["Prism","Say She She"],["Sideways","Flasher"],
+    ["Meet Me In Brooklyn","Yaya Bey"],["New D","Kirby"],["Worst Comes To Worst","Denzel Curry"],["LAB","Bulgarian Cartrader"],
+    ["Vest & Boxers","LAVA LA RUE"],["Goodbye","Melodiesinfonie"]
+  ],
+  "2021": [
+    ["Yüce Dag Basinda","Altin Gün"],["Comerte Entera","C. Tangana"],["Point and Kill","Little Simz, Obongjayar"],["Peur des filles","L'Impératrice"],
+    ["Kill Me","Indigo De Souza"],["Keep Moving","Jungle"],["Malika","Voyou, Ladaniva"],["Marechia","Nu Genea, Celia Kameni"],["I Love You, I Hate You","Little Simz"],
+    ["$payforhaiti","KAYTRANADA, Mach-Hommy"],["Llamameya","Jimena Angel"],["The Limit","Darkside"],["Losers","Balthazar"],["Feet Don't Fail Me Now","Joy Crookes"],
+    ["Ennui","Kit Sebastian"],["Ingobernable","C. Tangana"],["All Of The Time","Jungle"],["Kisasa Kisas","Anltin Gün"],["GIFTED","KALLITECHNIS"],
+    ["Cherry Pit","Luna Li"],["Free My People","Greentea Peng"],["m y . l i f e","J. Cole, 21 Savage"],["Man Next Door","U-Roy, Santigold"],
+    ["Take Me Where Your Heart Is","Q"],["Maçka Yollan","Altin Gün"],["BOSS","Crystal Murray"],["Moving Men","Myd, Mac DeMarco"],["What I Mean","Baby Berserk"],
+    ["A Dream With a Baseball Player","Faye Webster"],["Free","Parcels"],["Mano d'Oro","Crimi"],["La Perla","Sofia Kourtesis"],["23","Cleo Sol"],
+    ["Be Sweet","Japanese Breakfast"],["A Hero's Death (Soulwax Remix)","Fontaines D.C., Soulwax"],["Island Spell","Molly Lewis"],
+    ["Better","Joy Orbison, Léa Sen"],["Too Good","Arlo Parks"],["Calma","Marisa Monte"],["Over You","Aaron Frazer"],["Why Won't You Wait","Tora"],
+    ["Falling out the Sky","Armand Hammer, The Alchemist"],["Witchoo","Duran Jones & The Indications"],["Ordunun Dereleri","Altin Gün"],
+    ["Tocarte","C. Tangana"],["Relax","Rejjie Snow, grouptherapy."],["Provide","Sunni Colon"],["Sandman","SYRA"],["Bunny Is A Rider","Caroline Polachek"],
+    ["Joe Da Zin","Mad Rey, Jwles"]
+  ],
+  "2020": [
+    ["Te Queria","Lido Pimienta"],["Need Your Love","Tennis"],["sangria","hard life, Arlo Parks"],["Princess","Crystal Murray"],["Breathe Deeper","Tame Impala"],
+    ["Freak In Me","Mild Orange"],["Gospel For A New Century","Yves Tumor"],["Think That I Don't Need Your Love","Joesef"],["Bodyintoshapes","Elliot Moss"],
+    ["ALIVE","Hanni El Khatib"],["Texas Sun","Khruangbin, Leon Bridges"],["Home","Caribou"],["Dradonball Durag","Thundercat"],
+    ["Latin Grammys","Action Bronson"],["QADIR","Nick Hakim"],["Lost In Yesterday","Tame Impala"],["Sua Alma","Skinshape, D'Alma"],["Time (You and I)","Khruangbin"],
+    ["LA CANCION","maye"],["Hurt","Arlo Parks"],["Wildfires","Sault"],["Nada","Lido Pimienta"],["Don't Let Get You Down (Edit)","Wajatta, John Tejada"],
+    ["Désolé","Gorillaz, Fatoumata Diawara"],["Black Qualls (Single Version)","Thundercat, Steve Lacy"],["My Guess","Jaguar, Jaguar"],["Is It True","Tame Impala"],
+    ["Green Eggs & Ham","Princess Nokia"],["Tengo Fe","Blundetto, Chico Mann"],["Eugene","Arlo Parks"],["General Strike","The Souljazz Orchestra"],
+    ["The People","Photay"],["Come Back a Different Day","Jungle"],["Ordinary Guy","Toro Y Moi, The Mattson 2"],["Juice","Young Franco, Pell"],
+    ["Caipirinha","Djeuhdjoah, Lieutenant Nicholson"],["Love Song","Devendra Banhart"],["4 American Dollars","U.S. Girls"],["Can't Fight","Lianne La Havas"],
+    ["PEACE","Hanni El Khatib"],["Down The Line","Remi Wolf"],["Chances","Monophonics, Kelly Finn"],["Color My life","Chicano Batman"],
+    ["Maybe Another Time","Feng Suave"],["Paradigme","La Femme"],["Your Love (Déjà Vu)","Glass Animals"],["Sweet Sunshine","Otzeki"],
+    ["Free","Sault"],["NTE","Buscabulla"],["Amigo","Lous and The Yakuza"]
+  ],
+  "2019": [
+    ["Borderline","Tame Impala"],["Playground","Steve Lacy"],["On the Luna","Foals"],["Ordinary Pleasure","Toro Y Moi"],["Exits","Foals"],
+    ["Sunflower","Vampire Weekend, Steve Lacy"],["Gabriel","Y La Bamba"],["Barefoot In The Park","James Blake, Rosalia"],["Cola","Arlo Parks"],
+    ["bad guy","Billie Ellish"],["How Long?","Vampire Weekend"],["Insecurity","Metronomy"],["La Carga","The Bongo Hops"],["Keanu Reeves","Logic"],
+    ["MARIJUANA","Rilès"],["Sympathy","Vampire Weekend"],["Hijo de Su Madre","Omar Apollo"],["Into Nirvana","Maverick Sabre"],["On + Off","Maggie Rogers"],
+    ["You Made It","Bombay Bicycle Club"],["The Runner","Foals"],["WUTD","Genesis Owusu"],["Second Guessing","Arlo Parks"],["Forgotten Eyes","Big Thief"],
+    ["Futurism","Deerhunter"],["Heybb!","Binki"],["American Dream","The Jet Stone Conspiracy"],["MIDDLE CHILD","J. Cole"],["Fever","Balthazar"],
+    ["Andromeda","Weyes Blood"],["Jalisco","Babeheaven"],["hey rose","Son Little"],["Summer Girl","HAIM"],["High Lights (Edit)","Charlotte Adigéry"],
+    ["Pop Song","Perfume Genius"],["Soldi","Mahmood"],["Same Girl","Tess Henley"],["Nightlife Blues","North Downs"],["Freelance","Toro Y Moi"],
+    ["O Linndé","Trans Kabar, Stéphane Hoareau"],["Post Requisite","Flying Lotus"],["bury a friend","Billie Ellish"],["fancy","Isaac Delusion"],
+    ["Foreign Tides","RY X"],["Old Graffiti","Bibio"],["ZORA","Jamila Woods"],["A Caged Bird/Imitations of Life","The Cinematic Orchestra"],
+    ["Moon","Alaskalaska"],["10 Commandments","The Specials"],["Used To Love","Alfie Templeman"]
+  ],
+  "2018": [
+    ["Heavy, California","Jungle"],["Ladders","Mac Miller"],["Praise The Lord (Da Shine)","A$AP Rocky, Skepta"],["Bubblin","Anderson Paak"],["La thune","Angèle"],
+    ["This Is America","Childish Gambino"],["If You Know You Know","Pusha T"],["Fists of Fury","Kamasi Washington"],["Juliet & Caesar","Cautious Clay"],
+    ["The Day I Die","ISLAND"],["X","Schoolboy Q, 2 Chainz"],["Yikes","Kanye West"],["Jalousie","Angèle"],["Out Of Your League","Blood Orange, Steve Lacy"],
+    ["Saturday","Canine"],["House In LA","Jungle"],["Alright","Jain"],["Sundress","A$AP Rocky"],["The Game We Play","Pusha T"],["Smile","Jungle"],
+    ["Feels Like Summer","Childish Gambino"],["One Match","Until The Ribbon Breaks"],["The Rover","Interpol"],["Cityfade","Against All Logic"],
+    ["Vrai","Roméo Elvis, L'Or du Commun"],["King's Dead","Jay Rock, Kendrick Lamar, Future, James Blake"],["Shyne","BISKWIQ"],["The Gods Build","Big Ghost LTD"],
+    ["Dedicate","Lil Wayne"],["What's the Use?","Mac Miller"],["Beat 54 (All Good Now)","Jungle"],["All The Stars","Kendrick Lamar, SZA"],
+    ["Self Care","Mac Miller"],["List of Demands (Reparations)","The Kills"],["Move Me","Mura Masa, Octovian"],["OKRA","Tyler The Creator"],
+    ["Four Out Of Five","Arctic Monkeys"],["Tout oublier","Angèle, Roméo Elvis"],["1999 WILDFIRE","BROCKHAMPTON"],["Rêves bizarres","Orelsan, Damso"],
+    ["Cold Blooded","Jarami"],["Run The Road","Santigold"],["So Help Me God","Phonte"],["Album of the Year (Freestyle)","J. Cole"],["'Til It's Over","Anderson Paak"],
+    ["435","Tyler The Creator"],["Self Made","Jéricho Jackson"],["Barcelona boots","Arlie"],["Survival Tactics","Joey Bada$$, Capital Steez"],
+    ["1000°C","Lomepal, Roméo Elvis"]
+  ],
+  "2017": [
+    ["Dangerous","The XX"],["Believer","Imagine Dragons"],["HUMBLE.","Kendrick Lamar"],["Jungle","Tash Sultana"],["A Little While","Yellow Days"],
+    ["Big Fish","Vince Staples"],["Heart Is Full (Mark Ronson Remix)","Miike Snow, Mark Ronson"],["Put Your Money on Me","Arcade Fire"],
+    ["TEMPTATION","Joey Bada$$"],["In Cold Blood","alt-J"],["Chanel","Frank Ocean"],["Apricity","Syd Arthur"],["The System Only Dreams in Total Darkness","The Nacional"],
+    ["DNA.","Kendrick Lamar"],["ROCKABYE BABY","Joey Bada$$, Schoolboy Q"],["Replica","The XX"],["Baltimore (Sky At Night)","Kevin Morby"],
+    ["Baltimore (County Line)","Kevin Morby"],["ELEMENT.","Kendrick Lamar"],["Say Something Loving","The XX"],["Moon Tattoo","Sofi Tukker"],
+    ["Jungle","Petit Biscuit"],["Los Angeless","St. Vincent"],["Get It Together","Drake, Bkack Coffee, Jorja Smith"],["Sarah","Aliocha"],
+    ["Lips","The XX"],["SWEET","BROCKHAMPTON"],["Blood On Me","SAMPHA"],["Deathless","Ibeyi, Kamasi Washington"],["Systematic","DJ Shadow, Nas"],
+    ["Basique","Orelsan"],["You're Mine","PHANTOGRAM"],["BagBak","Vince Staples"],["Thunder","Imagine Dragons"],["Défaite de famille","Orelsan"],
+    ["Lemon","N.E.R.D, Rihanna"],["Why Is It","Mome, Merryn Jeann"],["Deadcrush","alt-J"],["Fools Wear Crowns","Hercules & Love Affair"],
+    ["List Of People (To Try And Forget About)","Tame Impala"],["DEVASTATED","Joey Bada$$"],["Blanket Me","Hundred Waters"],["Signs of Lie","Arcade Fire"],
+    ["Noise Pollution","Portugal. The Man, Mary Elizabeth Winstead"],["Truth","Kamasi Washington"],["Mawal (Simian Mobile Disco Remix)","Omar Souleyman"],
+    ["Squa","Nekfeu"],["Slip Away","Perfume Genius"],["Comets","Unno"],["Ar-Raqis","Clap! Clap!"]
+  ],
+  "2016": [
+    ["Life Itself","Glass Animals"],["The Season Carry Me","Anderson Paak"],["We The People…","A Tribe Called Quest"],["2100","Run The Jewels"],
+    ["Raw Gold","Beaty Heart"],["La belle âme","Fakear"],["Youth","Glass Animals"],["Animal Kingdom","Beau"],["Nobody Speak","DJ Shadow, Run The Jewels"],
+    ["Chandelier","Seratones"],["Gemini Feed","Banks"],["I Have Been to the Mountain","Kevin Morby"],["Masterpiece","Big Thief"],
+    ["Come Down","Anderson Paak, T.I."],["Shut Up Kiss Me","Angel Olsen"],["Action","Cassius, Cat Power, Mike D"],["Peace of What","RJD2, Jordan Brown"],
+    ["Doing It To Death","The Kills"],["Furnaces","Ed Harcourt"],["Makeba","Jain"],["Wild Season","Banks & Steelz, Florence Welch"],
+    ["Herefore (Roisto Remix)","Parcels"],["Superego","Leyya"],["Blue Lights","Jorja Smith"],["Drone Bomb Me","ANOHNI"],
+    ["All Night","Chance the Rapper, Knox Fortune"],["Quite Like","Her"],["Pool Party","Julia Jacklin"],["Get My Bang","Wild Beasts"],
+    ["No More Parties In LA","Kanye West"],["Lazarus","David Bowie"],["Panda","Desiigner"],["Temple","Baauer, M.I.A, G-Dragon"],
+    ["Do It Try It","M83"],["Never Be Like You","Flume, kai"],["Blow","Nadia Hair"],["Champion","The Roots"],["Smoke & Retribution","Flume, Vince Staples"],
+    ["Turn of Time","T.R.U.C.E"],["GOT IT GOOD","KAYTRANADA, Craig David"],["A 1000 Times","Hamilton Leithauser"],["Guilty","PJ Harvey"],
+    ["Hiéroglyphes","Pépite"],["Beautiful Strangers","Kevin Morby"],["In Time","Lake Jons"],["Days of Lavender","Promises Ltd."],
+    ["Running","Moderat"],["Sweet Relief","Kimbra"],["Come We Go","Jamie XX, DJ Koze"],["I Am Chemistry","Yeasayer"]
+  ],
+  "2015": [
+    ["King Kunta","Kendrick Lamar"],["Don't Wanna Fight","Alabama Shakes"],["Loud Places","Jamie XX, Romy"],["Wesley's Theory","Kendrick Lamar"],
+    ["All Day","Kanye West, Theophilus London"],["Hard Time","Seinabo Sey"],["Lie, Cheat, Steal","Run The Jewels"],["Next Time","Curtis Harding"],
+    ["Know Yourself","Drake"],["All in You","Synamson, Anna Kova"],["H20","Apollo Brown, Ras Kass"],["Energy","Drake"],
+    ["Hourglass","Disclosure, LION BABE"],["Castle In The Snow","tHE Avener, Kadebostany"],["Let It Happen","Tame Impala"],
+    ["Mountain at My Gates","Foals"],["Gosh","Jamie XX, MC Moose"],["Magnets","Disclosure, Lorde"],["Younger","Seinabo Sey"],
+    ["Annie","Neon Indian"],["CoCo","O.T. Genasis"],["Hood Politics","Kendrick Lamar"],["How Much A Dollar Cost","Kendrick Lamar"],
+    ["Hello","Adèle"],["Neva Eva","Apollo Brown, Barrel Brothers"],["Oh lala","PNL"],["Apparently","J. Cole"],["Be Together","Major Lazer, Wild Belle"],
+    ["Borders","M.I.A."],["Cream on Chrome","Ratatat"],["Actin Crazy","Action Bronson"],["Take Shelter","Years and Years"],
+    ["Reflection","TOWKIO, Kaytranada"],["Jump Off The Roof","Vince Taples, Snoh Aalegra"],["White Tiger","Izzy Bizu"],["Wet Dreamz","J. Cole"],
+    ["Hotline Bling","Drake"],["Le monde ou rien","PNL"],["You & The 6","Drake"],["Alright","Kendrick Lamar"],["Electric Body","A$AP Rocky, Schoolboy Q"],
+    ["Blessings","Big Sean, Drake"],["Lovesick","Mura Masa"],["Trophy","Future, Drake, Kanye West, Lil Wayne"],["Elastic Heart","Sia"],
+    ["Hate Street Dialogue","The Avener, Rodriguez"],["What Kind Of Man","Florence + The Machine"],["Be the One","Dua Lipa"],
+    ["Omen","Disclosure, Sam Smith"],["Inhale Exhale","Nao"]
+  ],
+  "2014": [
+    ["You & Me (Flume Remix)","Diclosure, Eliza Doolittle, Flume"],["Come On To Me","Major Lazer, Sean Paul"],["West Coast","Lana Del Rey"],
+    ["Wasting My Young Years","London Grammar"],["Black Widow","Iggy Azalea, Rita Ora"],["Jungle","Emma Louise"],["Undiscovered","Laura Weksh"],
+    ["Chandelier","Sia"],["Heroine (Duncan Murray Remix)","The Night VI"],["Nightswim","Owl Eyes"],["Fancy","Iggy Azalea, Charli XCX"],
+    ["Brookly Baby (Tom Vek Remix)","Lana Del Rey"],["Drop the Game","Flume, Chet Faker"],["i","Kendrick Lamar"],
+    ["I Will Be There (JMC Phantogram Remix)","Odessa"],["Self Control","Kate Boy"],
+    ["Seasons (Waiting On You) (Badbadnotgood Reinterpretation)","Future Islands, Badbadnotgood"],["Istanbul","Morrissey"],["Paris","Black Atlass"],
+    ["Never Catch Me","Flying Lotus, Kendrick Lamar"],["Love Letters","Metronomy"],["Prince Johnny","St. Vincent"],["Bad Things","Snoh Aalegra, Common"],
+    ["Gunshot","Lykke Li"],["Fade Out Lines","The Avener, Phoebe Killdeer"],["Limos","Vince Staples, Teyana Taylor"],["Two Weeks","FKA twigs"],
+    ["Let Me In","Kleerup, Susanne Sundfor"],["Push","A-Trak, Andrew Wyatt"],["So High","Dojo Cat"],["Ice Princess","Azealia Banks"],
+    ["Keep Your Lips Sealed","The Do"],["Supernatural","AlunaGeorge"],["Superstar","Broods"],["Stay High (Habits Remix)","Tove Lo, Hippie Sabotage"],
+    ["Vulnerable (Pomo Remix)","Tinashe"],["Hashtag My Ass","Etienne de Crécy"],["Prayer in C (Robin Schulz Remix)","Lilly Wood and The Prick"],
+    ["Away From You","Idriss Chebak"],["Jump Hi","LION BABE, Childish Gambino"],["La fille aux cheveux de soie","François & The Atlas Mountains"],
+    ["Tuesday","ILoveMakonnen, Drake"],["Forget You","Danglo"],["Pay for It","Jay Rock, Kendrick Lamar"],["Two Bodies","Flight Facilities, Emma Louise"],
+    ["Weightless","Vaski, Beak Nasty"],["Fire May Save You (Cesare Remix)","Frances"],["Grizzly Bear","Angus & Julia Stone"],
+    ["So Close (Wild Culture Remix)","Tom Misch, Carmody"],["Blake's Hitch","Simian Mobile Disco"]
+  ],
+  "2013": [
+    ["Get Lucky (Radio Edit)","Daft Punk, Pharrell Williams, Niles Rodgers"],["Thrift Shop","Macklemore & Ryan Lewis, Wanz"],["Reflektor","Arcade Fire"],
+    ["Get Free","Major Lazer, Amber Coffman"],["Black Skinhead","Kanye West"],["F.U.T.W.","Jay-Z"],["I See Ghost (Ghost Gunfighters)","As Animals"],
+    ["Papaoutai","Stromae"],["Double Bubble Trouble","M.I.A."],["Can't Hold Us","Macklemore & Ryan Lewis, Ray Dalton"],["Started From the Bottom","Drake"],
+    ["My Number","Foals"],["Blurred Lines","Robin Thicke, T.I., Pharrell Williams"],["Sacrilege","Yeah Yeah Yeahs"],["Tous les mêmes","Stromae"],
+    ["Why'd You Only Call Me When You're High?","Arctic Monkeys"],["Chum","Earl Sweatshirt"],["Q.U.E.E.N.","Janelle Monae, Erykah Badu"],
+    ["Here Comes the Night Time","Arcade Fire"],["Blood On The Leaves","Kanye West"],["Don't Wait","Mapei"],["Life Round Here","James Blake"],
+    ["La La La","Naughty Boy, Sam Smith"],["Shabba","AAPFerg,AAP Rocky"],["Type of Way","Rich Homie Quan"],
+    ["Lose Yourself to Dance","Daft Punk, Pharrell Williams"],["Your Drums, Your Love","AlunaGeorge"],["Jerk Ribs","Kelis"],["Carry Me","Bombay Bicycle Club"],
+    ["Oceans","Jay-Z, Frank Ocean"],["Band Against The Wall","Rocky"],["Romanticise","Chela"],["When A Fire Starts To Burn","Disclosure"],
+    ["La Danse De L'Homme Saoul","S-Crew, Super Social Jeez"],["The Mother We Share","CHVRCHES"],["Holdin On","Flume"],
+    ["You're Not Good Enough","Blood Orange"],["Home","Austra"],["I Love You","Woodkid"],["Set Me Free (Feel My Pain)","Charli XCX"],
+    ["Supersoaker","Kings of Leon"],["I Love It","Icona Pop, Charli XCX"],["Jessica","Major Lazer, Ezra Koenig"],
+    ["F**kin' Problems","A$AP Rocky, Drake, 2 Chainz, Kendrick Lamar"],["Beware","Big Sean, Lil Wayne, Jhené Aiko"],["Odd Look","Kavinsky, The Weeknd"],
+    ["18h30 - Bloqué","Casseurs Flowters"],["Harlem Shake","Baauer"],["Smoke Again","Chance The Rapper, Ab-Soul"],["That Loneliness","Jagwar Ma"]
+  ],
+  "2012": [
+    ["Video Games","Lana Del Rey"],["Pyramids","Frank Ocean"],["Swimming Pools (Drank)","Kendrick Lamar"],["Down The Road","C2C"],["Bad Girls","M.I.A."],
+    ["We Are Young","fun., Janelle Monae"],["Skyfall","Adele"],["I Follow Rivers (The Magician Remix)","Lykke Li, The Magician"],
+    ["One Day / Reckoning Song (Wankelmut Remix)","Asaf Avidan, The Mojos"],["Somebody That I Used To Know","Gotye, Kimbra"],["Losing You","Solange"],
+    ["Blue Jeans","Lana Del Rey"],["I Follow You","Melody's Echo Chamber"],["Elephant","Tame Impala"],["Wildest Moments","Jessie Ware"],
+    ["Bitch, Don't Kill My Vibe","Kendrick Lamar"],["Lost","Frank Ocean"],["Read All About It, Pt. III","Emeli Sandé"],["Best of Friends","Palma Violets"],
+    ["This Head I Hold","Electric Guest"],["Iron","Woodkid"],["Meet the Frownies","Mr Twin Sister"],["Because Of You","C2C, Pigeon John"],["Madness","Muse"],
+    ["Middle of the Night","Lilly Wood And The Prick"],["Fitzpleasure","alt-J"],["Summertime Sadness","Lana Del Rey"],["Diamonds","Rihanna"],
+    ["Ho Hey","The Lumineers"],["Knobbers","Crookers"],["Flutes","Hot Chip"],["Thinkin Bout You","Frank Ocean"],["Girl On Fire","Alicia Keys"],
+    ["Edward the Confessor","Breton"],["Make It Bun Dem","Skrillex, Damian Jr Marley"],["Call Me Maybe","Carly Rae Jepsen"],["Lazuli","Beach House"],
+    ["Heaven","Emeli Sandé"],["Locked Out of Heaven","Bruno Mars"],["Arcades","C2C"],["Gangnam Style","Psy"],["R U Mine?","Arctic Monkeys"],
+    ["Follow Me","Muse"],["Feels Like You Only Go Backwards","Tame Impala"],["Breezeblocks","alt-J"],["Perfect World","Gossip"],["La Suite","1995"],
+    ["Give Me All Your Luvin'","Madonna, M.I.A., Nicki Minaj"],["Hands","The Ting Tings"],["Bangarang","Skrillex, Sirah"]
+  ],
+  "2011": [
+    ["Rolling in the Deep","Adele"],["Pumped Up Kicks","Foster the People"],["Lonely Boy","The Black Keys"],["The Look","Metronomy"],
+    ["Price Tag","Jessie J, B.o.B"],["Shake It Out","Florence + The Machine"],["Someone Like You","Adele"],["Machu Picchu","The Strokes"],
+    ["Don't Stop (Color on the Walls)","Foster the People"],["Otis","Jay-Z, Kanye West, Otis Redding"],["Nightcall","Kavinsky"],["Midnight City","M83"],
+    ["Days Are Forgotten","Kasabian"],["Satelitte, The Kills"],["Car Song","Spank Rock, Santigold"],["La Fee Verte","Kasabian"],["Run the World (Girls)","Beyoncé"],
+    ["Always On The Run","Yuksek"],["Crazy Vibes","Selah Sue"],["She's Thunderstorms","Arctic Monkeys"],["So American","Portugal. The Man"],
+    ["DNA","The Kills"],["Man Down","Rihanna"],["Under Cover of Darkness","The Strokes"],["The Hellcat Spangled Shalalala","Arctic Monkeys"],
+    ["Cheerleader","St. Vincent"],["Down With The Trumpets","Rizzle Kicks"],["On A Train","Yuksek"],["Paradise","Coldplay"],
+    ["Call It What You Want","Foster The People"],["Raggamuffin","Selah Sue"],["Off The Wall","Yuksek"],
+    ["The Death Of You And Me","Noel Gallagher's High Flying Birds"],["Niggas in Paris","Jay-Z, Kanye West"],["Rearrange","Miles Kane"],
+    ["Peace Of Mind","Selah Sue"],["How Deep Is Your Love?","The Rapture"],["Let England Shake","PJ Harvey"],["Only Girl (In The World)","Rihanna"],
+    ["The Bay","Metronomy"],["We Found Love","Rihanna, Calvin Harris"],["Miracle Worker","SuperHeavy"],["Lights","Ellie Goulding"],["Sun of a Gun","Og Land"],
+    ["Young Blood","The Naked And Famous"],["212","Azealia Banks"],["On'n'On","Justice"],["Yonkers","Tyler The Creator"],["Time To Dance","The Shoes"],
+    ["The Roller","Beady Eye"]
+  ],
+  "2010": [
+    ["Tightrope","Jannelle Monae, Big Boi"],["POWER","Kanye West"],["I Need A Dollar","Aloe Blacc"],["Baby I'm Yours","Breakkbot"],
+    ["Big Jet Plane","Angus & Julia Stone"],["Tighten Up","The Black Keys"],["XXXO","M.I.A."],["All Of The Lights","Kanye West"],
+    ["The Suburbs","Arcade Fire"],["As We Enter","Nas, Damian Jr Marley"],["Telephone","Lady Gaga, Beyoncé"],["The Lazy Song","Bruno Mars"],
+    ["Shutterbugg","Big Boi, Cutty"],["Airplanes","B.o.B, Hayley Williams"],["Loca","Shakira, El Cata"],["Alejandro","Lady Gaga"],
+    ["I Love U So","Cassius"],["Seven Nation Army","Ben L'Oncle Soul"],["Everlasting Light","The Black Keys"],["Hey, Soul Sister","Train"],
+    ["Down The Drain","Lilly Wood And The Prick"],["Alors on danse","Stromae"],["She Said","Plan B"],["I Can Talk","Two Door Cinema Club"],
+    ["Help Myself","Gaëtan Roussel"],["Barbara Streisand","Duck Sauce"],["Erase Me (Pain)","Kid Cudi, Kanye West"],["California Gurls","Katy Perry, Snoop Dogg"],
+    ["Paradise Circus","Massive Attack"],["The Same Space","Klaxons"],["Give Me Your Life","Skip the Use"],["Howlin' for Yoy","The Black Keys"],
+    ["Ready to Start","Arcade Fire"],["Sunday With A Flu","Yodelice"],["Echoes","Klaxons"],["Fuck You","Cee Lo Green"],["Clap Yor Hands","Sia"],
+    ["Rude Boy","Rihanna"],["Cousins","Vampire Weekend"],["Envoi","Absynthe Minded"],["Something Good Can Work","Two Door Cinema Club"],
+    ["Mowgli's Road","Marina"],["Dis-moi encore que tu m'aimes","Gaëtan Roussel"],["Rabiosa","Shakira, El Cata"],["Runaway","Kanye West, Pusha-T"],
+    ["Follow Us","Big Boi, Vonnegutt"],["Rise Up","Milk Coffee & Sugar, Tumi and the Volume"],["Stylo","Gorillaz, Mos Def, Bobby Womack"],
+    ["Spanish Sahara","Foals"],["Dancing On My Own","Robyn"]
+  ],
+  "2009": [
+    ["Heavy Cross","Gossip"],["Empire State Of Mind","Jay-Z, Alicia Keys"],["Bulletproof","La Roux"],["Bad Romance","Lady Gaga"],
+    ["Day 'N' Nite","Kid Cudi, Crookers"],["Tik Tok","Kesha"],["Underdog","Kasabian"],["Uprising","Muse"],["Lisztomania","Phoenix"],
+    ["Heads Will Roll","Yeah Yeah Yeahs"],["Heaven Can Wait","Charlotte Gainsbourg, Beck"],["Hey You","Pony Pony Run Run"],
+    ["D.O.A. (Death Of Auto-Tune)","Jay-Z"],["Crystalised","The XX"],["No You Girls","Franz Ferdinand"],["The Fear","Lily Allen"],
+    ["Dans Ma Rue","Féfé"],["Don't Upset The Rhythm (Go Baby Go)","Noisettes"],["Shark In the Water","V V Brown"],["Say Yes","Wax Tailor"],
+    ["Relator","Pete Yorn, Scarlett Johansson"],["Paparazzi","Lady Gaga"],["Dominos","The Big Pink"],["Lets Go Surfing","The Drums"],
+    ["Sugar Sugar","Diving With Andy"],["Last of the English Roses","Peter Doherty"],["In For The Kill","La Roux"],["Crying Lightning","Arctic Monkeys"],
+    ["Get Around Town","Revolver"],["Heartbeat","Nneka"],["Extraball","Yuksek"],["LEAVE!","V V Brown"],["Around the Bend","The Asteroids Galaxy Tour"],
+    ["Junebug","Robert Francis"],["Two Weeks","Grizzly Bear"],["11th Dimension","Julian Casablancas"],["Buddy Love","Speech Debelle"],
+    ["Ayo Technology","Milow"],["22","Lily Allen"],["Ghostin'","Speech Defect"],["Magnificent","U2"],["Resistance","Muse"],
+    ["Little Girl","Danger Mouse, Julian Casablancas"],["Love Long Distance","Gossip"],["Boom Boom Pow","Black Eyed Peas"],
+    ["Punk Spirit","Wave Machines"],["The Show","Lenka"],["Antibodies","Poni Hoax"],["Bruises","Chairlift"],["Angela","Jarvis Cocker"]
+  ]
+};
+
+let currentYear = "2025";
+const extensions = ['.jpeg', '.jpg', '.png', '.webp', '.JPEG', '.JPG', '.PNG'];
+
+function getSpotifyUri(title, artist) {
+  return "spotify:search:" + encodeURIComponent(title + " " + artist);
+}
+
+function tryLoadImage(container, year, rank, trackTitle) {
+  let extIndex = 0;
+  function attempt() {
+    if (extIndex >= extensions.length) {
+      container.classList.add('fallback');
+      const span = document.createElement('span');
+      span.className = 'arttext';
+      span.textContent = trackTitle;
+      container.appendChild(span);
+      return;
+    }
+    const ext = extensions[extIndex];
+    const imgPath = `${year}-${rank}${ext}`;
+    const img = new Image();
+    img.onload = function() { container.style.backgroundImage = `url('${imgPath}')`; };
+    img.onerror = function() { extIndex++; attempt(); };
+    img.src = imgPath;
+  }
+  attempt();
+}
+
+function renderYear(year) {
+  currentYear = year;
+  document.getElementById('nav-home').classList.add('active');
+  document.getElementById('nav-artists').classList.remove('active');
+  document.getElementById('years-block').style.display = 'block';
+
+  document.getElementById('hero-title').textContent = year;
+  document.getElementById('hero-subtitle').textContent = "Top " + (archives[year] ? archives[year].length : 0);
+  document.getElementById('hero-intro').textContent = `Archives musicales de l'année ${year}.`;
+  document.getElementById('footer-info').textContent = `${year} · Top ` + (archives[year] ? archives[year].length : 0);
+
+  document.querySelectorAll('.year-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.year === year);
+  });
+
+  const tracks = archives[year] || [];
+  const content = document.getElementById('content-area');
+  content.innerHTML = '';
+
+  const head1 = document.createElement('div');
+  head1.className = 'section-head';
+  head1.innerHTML = '<h3>Mes 8 morceaux préférés</h3><div class="rule"></div><div class="count">1 — 8</div>';
+ 
+  const featGrid = document.createElement('section');
+  featGrid.className = 'featured';
+
+  tracks.slice(0, 8).forEach((t, i) => {
+    const rank = i + 1;
+    const card = document.createElement('article');
+    card.className = 'track-card';
+
+    const cover = document.createElement('div');
+    cover.className = 'cover';
+    tryLoadImage(cover, year, rank, t[0]);
+
+    const meta = document.createElement('div');
+    meta.className = 'track-meta';
+    meta.innerHTML = `<div class="rank">${rank}.</div><div><div class="track-name">${t[0]}</div><div class="artist">${t[1]}</div></div>`;
+
+    const link = document.createElement('a');
+    link.className = 'listen';
+    link.href = getSpotifyUri(t[0], t[1]);
+    link.textContent = 'Écouter sur Spotify';
+
+    card.append(cover, meta, link);
+    featGrid.appendChild(card);
+  });
+
+  const head2 = document.createElement('div');
+  head2.className = 'section-head';
+  head2.innerHTML = '<h3>Le classement complet</h3><div class="rule"></div><div class="count">9 — ' + tracks.length + '</div>';
+
+  const compactGrid = document.createElement('section');
+  compactGrid.className = 'compact';
+
+  tracks.slice(8).forEach((t, j) => {
+    const rank = j + 9;
+    const row = document.createElement('div');
+    row.className = 'list-track';
+    row.innerHTML = `
+      <div class="rank">${rank}.</div>
+      <div style="min-width:0">
+        <div class="list-title">${t[0]}</div>
+        <div class="list-artist">${t[1]}</div>
+      </div>
+      <a class="listen" href="${getSpotifyUri(t[0], t[1])}">Écouter</a>
+    `;
+    compactGrid.appendChild(row);
+  });
+
+  content.append(head1, featGrid, head2, compactGrid);
+}
+
+function renderArtists() {
+  document.getElementById('nav-home').classList.remove('active');
+  document.getElementById('nav-artists').classList.add('active');
+  document.getElementById('years-block').style.display = 'none';
+
+  document.getElementById('hero-title').textContent = "Artistes";
+  document.getElementById('hero-subtitle').textContent = "Index complet";
+  document.getElementById('hero-intro').textContent = "Tous les artistes présents dans vos archives musicales (2009-2025).";
+  document.getElementById('footer-info').textContent = "Tous les artistes";
+
+  const artistMap = {};
+  Object.entries(archives).forEach(([year, tracks]) => {
+    tracks.forEach((t, i) => {
+      const artistName = t[1];
+      if (!artistMap[artistName]) artistMap[artistName] = [];
+      artistMap[artistName].push({ title: t[0], year: year, rank: i + 1 });
+    });
+  });
+
+  const sortedArtists = Object.keys(artistMap).sort((a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' }));
+
+  const content = document.getElementById('content-area');
+  content.innerHTML = '';
+
+  const compactGrid = document.createElement('section');
+  compactGrid.className = 'compact';
+
+  sortedArtists.forEach(artist => {
+    artistMap[artist].forEach(item => {
+      const row = document.createElement('div');
+      row.className = 'list-track';
+      row.innerHTML = `
+        <div class="rank" style="min-width:42px;color:var(--accent);font-size:11px">${item.year}</div>
+        <div style="min-width:0">
+          <div class="list-title">${artist}</div>
+          <div class="list-artist">#${item.rank} — ${item.title}</div>
+        </div>
+        <a class="listen" href="${getSpotifyUri(item.title, artist)}">Écouter</a>
+      `;
+      compactGrid.appendChild(row);
+    });
+  });
+
+  content.appendChild(compactGrid);
+}
+
+function initYearButtons() {
+  const container = document.getElementById('year-btns');
+  container.innerHTML = '';
+  Object.keys(archives).sort().reverse().forEach(y => {
+    const btn = document.createElement('button');
+    btn.className = `year-btn ${y === currentYear ? 'active' : ''}`;
+    btn.dataset.year = y;
+    btn.textContent = y;
+    btn.onclick = () => renderYear(y);
+    container.appendChild(btn);
+  });
+}
+
+document.getElementById('search-input').addEventListener('input', (e) => {
+  const query = e.target.value.toLowerCase().trim();
+  if (!query) {
+    if (document.getElementById('nav-artists').classList.contains('active')) {
+      renderArtists();
+    } else {
+      renderYear(currentYear);
+    }
+    return;
+  }
+
+  const content = document.getElementById('content-area');
+  content.innerHTML = '<div class="section-head"><h3>Résultats de recherche</h3><div class="rule"></div></div>';
+ 
+  const compactGrid = document.createElement('section');
+  compactGrid.className = 'compact';
+
+   Object.entries(archives).forEach(([year, tracks]) => {
+    tracks.forEach((t, i) => {
+      // Sécurisation : vérifie que le morceau possède bien un titre et un artiste sous forme de tableau
+      if (Array.isArray(t) && t[0] && t[1]) {
+        const titleLower = t[0].toLowerCase();
+        const artistLower = t[1].toLowerCase();
+        const searchLower = query.toLowerCase().trim();
+
+        if (titleLower.includes(searchLower) || artistLower.includes(searchLower)) {
+          const row = document.createElement('div');
+          row.className = 'list-track';
+          row.innerHTML = `
+            <div class="rank" style="min-width:40px;color:var(--muted)">${year}</div>
+            <div style="min-width:0">
+              <div class="list-title">#${i + 1} — ${t[0]}</div>
+              <div class="list-artist">${t[1]}</div>
+            </div>
+            <a class="listen" href="${getSpotifyUri(t[0], t[1])}">Écouter</a>
+          `;
+          compactGrid.appendChild(row);
+        }
+      }
+    });
+  });
+
+  content.appendChild(compactGrid);
+});
+
+document.getElementById('nav-home').onclick = () => renderYear('2025');
+document.getElementById('nav-artists').onclick = () => renderArtists();
+
+initYearButtons();
+renderYear('2025');
+</script>
+</body>
+</html>
